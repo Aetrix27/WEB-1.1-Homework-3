@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section>
-    {#
-        TODO: Replace the hard-coded city and date below with data from the 
-        server 
-    #}
-    <h1>Weather in San Francisco</h1>
-    <p>on Saturday, August 29, 2020</p>
-    
-    {#
-        TODO: Add the temperature, description, humidity, wind speed, sunrise,
-        & sunset below. Replace 'F' with the appropriate units.
-    #}
+<section class="weather-form">
+
+    <h1>Weather in {{ city }}, {{ state }}</h1>
+    <p>on {{ date.strftime('%B %d, %Y') }}</p>
+
+    <div>
+      <img src="http://openweathermap.org/img/wn/{{ icon }}@2x.png">
+    </div>
+
     <ul>
-        <li>Temperature: ° F</li>
-        <li>Description: </li>
-        <li>Humidity: %</li>
-        <li>Wind speed:  miles/hour</li>
-        <li>Sunrise: </li>
-        <li>Sunset: </li>
+        <li>Description: {{ description }}</li>
+        <li>Temperature: {{ temp }}° {{ units_letter }}</li>
+        <li>Min: {{ min_temp }}° {{ units_letter }} </li>
+        <li>Max: {{ max_temp }}° {{ units_letter }}</li>
     </ul>
-    
+
+    <div>
+      <canvas id="myChart" width="400" height="400"></canvas>
+    </div>
+
+   <!-- <img src="/graph/{{ lat }}/{{ lon }}/{{ units }}/{{ date.strftime('%Y-%m-%d') }}"> -->
+
 </section>
 {% endblock %}

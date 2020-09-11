@@ -1,20 +1,21 @@
 body {
-    background-color: #e6faff;
+    background-image: url('https://wi-images.condecdn.net/image/doEYpG6Xd87/crop/2040/f/weather.jpg');
     display: flex;
     justify-content: center;
-    font-family: "Roboto", sans-serif;
+    font-family: "Helvetica", sans-serif;
 }
 
 main {
     width: 800px;
+    background-image: url('https://wi-images.condecdn.net/image/doEYpG6Xd87/crop/2040/f/weather.jpg');
+
 }
 
 main > section {
-    background-color: #fff;
-    border: 1px solid #007a99;
+    border: 1px solid black;
     box-shadow: 5px 5px 5px #999;
     padding: 20px;
-    margin-top: 20px;
+    margin-top: 40px;
     width: 100%;
 }
 
@@ -25,4 +26,11 @@ fieldset {
 h1 a {
     color: #000;
     text-decoration: none;
+   
+}
+
+body{ 
+    border: 1px solid #000;
+    background-color:orange
+
 }

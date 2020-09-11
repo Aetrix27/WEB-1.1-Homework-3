@@ -1,27 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<section class="weather-form">
+<section>
 
     <h1>Weather in {{ city }}, {{ state }}</h1>
-    <p>on {{ date.strftime('%B %d, %Y') }}</p>
+    <p>on {{ date }}</p>
 
-    <div>
-      <img src="http://openweathermap.org/img/wn/{{ icon }}@2x.png">
-    </div>
 
     <ul>
-        <li>Description: {{ description }}</li>
-        <li>Temperature: {{ temp }}° {{ units_letter }}</li>
-        <li>Min: {{ min_temp }}° {{ units_letter }} </li>
-        <li>Max: {{ max_temp }}° {{ units_letter }}</li>
+        <h1>
+            Temperature: {{ temp }}° {{ units_letter }}
+            Description: {{ description }}
+            Humidity: {{ humidity }}%
+            Wind speed:  {{ wind_speed }} miles/hour
+        </h1>
+        <h1>
+            Sunrise: {{ sunrise }}
+            Sunset: {{ sunset }}
+        </h1>
     </ul>
-
-    <div>
-      <canvas id="myChart" width="400" height="400"></canvas>
-    </div>
-
-   <!-- <img src="/graph/{{ lat }}/{{ lon }}/{{ units }}/{{ date.strftime('%Y-%m-%d') }}"> -->
 
 </section>
 {% endblock %}

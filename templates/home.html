@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<section class="weather-form">
+<!-- Input for Weather Info -->
+<body>
+<section class="weather-form" id="section1">
     <h2>What's the weather like today?</h1>
 
     <form action="/results" method="GET">
@@ -81,5 +82,52 @@
         </fieldset>
     </form>
 </section>
+
+<!-- Input for Forecast -->
+<section class="weather-form">
+    <form action="forecast_results" method="GET">
+        <h2>Get 7 Day Forecast for This Week</h1>
+        <fieldset>
+            <legend>Please enter your information:</legend>
+
+            <p>
+                <label>
+                    Please enter your city: <br>
+                    <input type="text" name="city">
+                </label> </br>
+            </p>
+
+            <p>
+                Please choose your desired units: <br>
+                <label>
+                    <input type="radio" name="units" value="metric">
+                    Celsius
+                </label><br>
+                <label>
+                    <input type="radio" name="units" value="imperial">
+                    Fahrenheit
+                </label><br>
+                <label>
+                    <input type="radio" name="units" value="kelvin">
+                    Kelvin
+                </label>
+            </p>
+
+            <p>
+                <label>
+                    Please choose the date you'd like info on </br>
+                    (Must be within the next 7 days): </br>
+
+                    <input type="date" name="date" min="{{ max_date.strftime('%Y-%m-%d') }}">
+                </label>
+            </p>
+
+            <p>
+                <input type="submit" value="Submit">
+            </p>
+        </fieldset>
+    </form>
+</section>
+</body>
 
 {% endblock content %}

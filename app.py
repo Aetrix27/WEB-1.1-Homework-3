@@ -20,7 +20,6 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 app = Flask(__name__)
 
-# Get the API key from the '.env' file
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
 
@@ -44,9 +43,11 @@ pp = PrettyPrinter(indent=4)
 @app.route('/')
 def home():
     """Displays the homepage with forms for current or historical data."""
+
+    dateNow = datetime.now()
     context = {
-        'min_date': (datetime.now() - timedelta(days=5)),
-        'max_date': datetime.now()
+        'min_date': (dateNow - timedelta(days=5)),
+        'max_date': dateNow
     }
     return render_template('home.html', **context)
 
@@ -60,9 +61,7 @@ def results():
 
     city = request.args.get('city')
     units = request.args.get('units')
-
     url = 'http://api.openweathermap.org/data/2.5/weather'
-
     latitude, longitude = get_lat_lon(city)
 
     params = {
@@ -73,10 +72,6 @@ def results():
     }
 
     result_json = requests.get(url, params=params).json()
-    pp.pprint(result_json)
-
-    #current=result_json['current']
-    # Uncomment the line below to see the results of the API call
     weather = result_json.get('weather')
 
     context = {
@@ -88,9 +83,10 @@ def results():
         'wind_speed': result_json['wind']['speed'],
         'sunrise': datetime.utcfromtimestamp(int(result_json['sys']['sunrise'])).strftime('%Y-%m-%d %H:%M %p'),
         'sunset': datetime.utcfromtimestamp(int(result_json['sys']['sunset'])).strftime('%Y-%m-%d %H:%M %p'),
-        'units_letter': get_letter_for_units(units)
+        'units_letter': get_letter_for_units(units),
+        'icon': weather[0]['icon']
     }
-
+    #Used to get sunrise and sunset: https://stackoverflow.com/questions/7064531/sunrise-sunset-times-in-c/19706933
     return render_template('results.html', **context)
 
 def get_min_temp(results):
@@ -102,7 +98,6 @@ def get_min_temp(results):
             min=result['temp']
         
     return min
-
 
 def get_max_temp(results):
     """Returns the maximum temp for the given hourly weather objects."""
@@ -120,6 +115,51 @@ def get_lat_lon(city_name):
     if location is not None:
         return location.latitude, location.longitude
     return 0, 0
+@app.route('/forecast_results')
+def forecast_results():
+    """Displays results for future weather conditions."""
+
+    date = request.args.get('date')
+    date_obj = datetime.strptime(date, '%Y-%m-%d')
+    city = request.args.get('city')
+    date_in_seconds = date_obj.strftime('%s')
+    units = request.args.get('units')
+    latitude, longitude = get_lat_lon(city)
+
+    url = 'https://api.openweathermap.org/data/2.5/onecall'
+    params = {
+        'dt' : date_in_seconds,
+        'units' : units,
+        'appid': API_KEY,
+        'lat': latitude,
+        'lon': longitude,
+        
+    }
+    result_json = requests.get(url, params=params).json()
+    result_current = result_json['current']
+    current_day_list = []
+    days = result_json['daily']
+
+    for day in days:
+        current_day_list.append(datetime.fromtimestamp(day['dt']).strftime('%A, %B %d, %Y'))
+
+    context = {
+        'date': date_obj,
+        'city': city,
+        'description': result_current['weather'][0]['description'],
+        'temp': result_current['temp'],
+        'humidity': result_current['humidity'],
+        'wind_speed': result_current['wind_speed'],
+        'sunrise': datetime.fromtimestamp(result_current['sunrise']).strftime('%I:%M %p'),
+        'sunset': datetime.fromtimestamp(result_current['sunset']).strftime('%I:%M %p'),
+        'units_letter': get_letter_for_units(units),
+        'icon': result_current['weather'][0]['icon'],
+        'days': days,
+        'day_list': current_day_list
+
+    }
+
+    return render_template('forecast_results.html', **context)
 
 @app.route('/historical_results')
 def historical_results():
@@ -128,10 +168,8 @@ def historical_results():
     city = request.args.get('city')
     date = request.args.get('date')
     units = request.args.get('units')
-
     date_obj = datetime.strptime(date, '%Y-%m-%d')
     date_in_seconds = date_obj.strftime('%s')
-
     latitude, longitude = get_lat_lon(city)
 
     url = 'http://api.openweathermap.org/data/2.5/onecall/timemachine'
@@ -141,14 +179,9 @@ def historical_results():
         'appid': API_KEY,
         'lat': latitude,
         'lon': longitude,
-        
     }
 
     result_json = requests.get(url, params=params).json()
-
-    # Uncomment the line below to see the results of the API call!
-    pp.pprint(result_json)
-
     result_current = result_json['current']
     result_hourly = result_json['hourly']
 
@@ -158,11 +191,14 @@ def historical_results():
         'lat': latitude,
         'lon': longitude,
         'units': units,
-        'units_letter': get_letter_for_units(units), # should be 'C', 'F', or 'K'
+        'units_letter': get_letter_for_units(units), 
         'description': result_current['weather'][0]['description'],
         'temp': result_current['temp'],
         'min_temp': get_min_temp(result_hourly),
-        'max_temp': get_max_temp(result_hourly)
+        'max_temp': get_max_temp(result_hourly),
+        'icon': result_current['weather'][0]['icon'],
+        'sunrise': datetime.fromtimestamp(result_current['sunrise']).strftime('%I:%M %p'),
+        'sunset': datetime.fromtimestamp(result_current['sunset']).strftime('%I:%M %p')
     }
 
     return render_template('historical_results.html', **context)
@@ -208,10 +244,9 @@ def graph(lat, lon, units, date):
         'units': units,
         'dt': date_in_seconds
     }
+
     result_json = requests.get(url, params=params).json()
-
     hour_results = result_json['hourly']
-
     hours = range(24)
     temps = [r['temp'] for r in hour_results]
     image = create_image_file(

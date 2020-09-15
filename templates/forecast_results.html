@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="weather-form">
+<div id ="headerDiv">
+    <h2>You chose the day: {{date.strftime('%B %d, %Y') }}</h2>
+    <h2>Forecast for 7 days of {{ city }}</h2>
+</div>
+    <!--Iterates through and displays the list of days, and if the date is equal to the 
+    chosen date, that specific date is highlighted in Green, and a message is displayed.-->
+    {% for day in days %}
+        {% if date.strftime('%A, %B %d, %Y') ==  day_list[days.index(day)]  %}
+        <div id="div2">
+            <p>{{ day_list[days.index(day)] }}</p>
+        <div>
+            <img src="http://openweathermap.org/img/wn/{{ day['weather'][0]['icon'] }}@2x.png"/>
+        </div>
+            <p>Description: {{ day['weather'][0]['description'] }}</p>
+            <p>Max: {{ day['temp']['max'] }}° {{ units_letter }}</p>
+            <p>Min: {{ day['temp']['night'] }}° {{ units_letter }}</p>
+            <p>Humidity: {{ day['humidity'] }}%</p>
+            <p>Sunrise: {{ day['sunrise'] }}</p>
+            <p>Sunset: {{ day['sunset'] }}</p>
+            <p>Wind speed: {{ day['wind_speed'] }} mph</p>
+
+        </div>   
+
+        {% endif %}
+        <hr>
+       
+        <div id="div3">
+            <p>{{ day_list[days.index(day)] }}</p>
+        <div>
+            <img src="http://openweathermap.org/img/wn/{{ day['weather'][0]['icon'] }}@2x.png"/>
+        </div>
+    
+        <p>Description: {{ day['weather'][0]['description'] }}</p>
+        <p>High: {{ day['temp']['max'] }}° {{ units_letter }}</p>
+        <p>Low: {{ day['temp']['night'] }}° {{ units_letter }}</p>
+        <p>Humidity: {{ day['humidity'] }}%</p>
+        <p>Sunrise: {{ day['sunrise'] }}</p>
+        <p>Sunset: {{ day['sunset'] }}</p>
+        <p>Wind speed: {{ day['wind_speed'] }} mph</p>
+
+   
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}
